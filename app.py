@@ -602,40 +602,53 @@ server = app.server
 first_options = [{'label': 'Camera {}'.format(i), 'value': i} for i in range(7)]
 
 app.layout = html.Div([
-    dbc.Row([dbc.Col(html.P('Please select the first camera:', style={'font-size': 20}), width={'size': 3}),
+    dbc.Row([dbc.Col(html.P('Please select the first camera:', style={'font-size': 20}), width={'size': 6}, lg=4),
              dbc.Col(dcc.Dropdown(
                  id='dropdown_0',
                  options=first_options,
                  value='0',
-             ), width={'size': 3, 'offset': 0})]
+             ), width={'size': 6, 'offset': 0}, lg=4)]
             ),
     dbc.Row([
-        dbc.Col(html.P('Please select the second camera:'), style={'font-size': 20}, width={'size': 3}),
+        dbc.Col(html.P('Please select the second camera:'), style={'font-size': 20}, width={'size': 6}, lg=4),
         dbc.Col(dcc.Dropdown(
             id='dropdown_1',
             value='1',
-        ), width={'size': 3, 'offset': 0})
+        ), width={'size': 6, 'offset': 0}, lg=4)
     ]),
     dbc.Row([
         dbc.Col(html.P('Click on image or select the particle in the first camera:'), style={'font-size': 20},
-                width={'size': 3}),
+                width={'size': 6}, lg=4),
         dbc.Col(dcc.Dropdown(
             id='dropdown_2',
             value='0',
-        ), width={'size': 3, 'offset': 0})
+        ), width={'size': 6, 'offset': 0}, lg=4)
     ]),
     dbc.Row([
-        dbc.Col(html.P('Change to small if images are too large to fit:'), style={'font-size': 20}, width={'size': 3}),
-        dbc.Col(dcc.Dropdown(
-            id='scale-factors',
-            value='1',
-            options=[{'label': 'Small', 'value': 0.5},
-                     {'label': 'Large', 'value': 1.0}]
-        ), width={'size': 3})
+        dbc.Col(html.P('Change to small if images are too large to fit:'), style={'font-size': 20}, width={'size': 6}, lg=4),
+        dbc.Col(
+            dcc.Slider(
+                id='scale-factors',
+                min=0,
+                max=1,
+                step=0.1,
+                value=0.5,
+                marks={
+                    0: '0',
+                    0.2: '0.2',
+                    0.4: '0.4',
+                    0.6: '0.6',
+                    0.8: '0.8',
+                    1: '1',
+                },
+            ),
+            width=6, lg=4
+        )
+
     ]),
     dbc.Row([
-        dbc.Col(dcc.Graph(id='img0'), width={'size': 6}),
-        dbc.Col(dcc.Graph(id='img1'), width={'size': 6}),
+        dbc.Col(dcc.Graph(id='img0'), id="img0_col", width={'size': 6, 'offset': 0}),
+        dbc.Col(dcc.Graph(id='img1'), id="img1_col", width={'size': 6, 'offset': 0}),
     ])
 ])
 
@@ -745,11 +758,11 @@ def update_output(value_0, value_1, value_2, value_3):
         go.Scatter(x=xs * scale_factor, y=(img_height - 1 - ys) * scale_factor,
                    mode='lines',
                    line=dict(color='royalblue', width=1),
-                   opacity=opacity
+                   opacity=0.1
                    ),
     )
 
-    epipolar_threshold_factor = 3
+    epipolar_threshold_factor = 5
 
     # ax + by + c = 0
     # ax + by + c' = 0
@@ -803,7 +816,7 @@ def update_output(value_0, value_1, value_2, value_3):
         x=list(xs * scale_factor) + list(xs_reverse * scale_factor),
         y=list(ys_upper * scale_factor) + list(ys_lower_reverse * scale_factor),
         fill='toself',
-        fillcolor='rgba(231,107,243,0.2)',
+        fillcolor='rgba(255,255,255,0.0)',
         line_color='rgba(255,255,255,0)',
         showlegend=False,
         name='Ideal',
@@ -852,7 +865,7 @@ def update_output(value_0, value_1, value_2, value_3):
             ),
             align="center",
             arrowhead=2,
-            arrowsize=1,
+            arrowsize=0.5,
             arrowwidth=5,
             arrowcolor="#636363",
             ax=100,
@@ -861,7 +874,9 @@ def update_output(value_0, value_1, value_2, value_3):
             borderwidth=2,
             borderpad=4,
             bgcolor="#ff7f0e",
-            opacity=0.8
+            opacity=0.8,
+            xshift=10,
+            yshift=10
         )
 
     fig_1.add_trace(
